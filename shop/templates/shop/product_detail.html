@@ -1,0 +1,131 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+<div style="display: flex; gap: 2rem; margin-bottom: 3rem;">
+    <div style="flex: 1;">
+        {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 100%; border-radius: 8px;">
+        {% else %}
+            <img src="https://via.placeholder.com/500x400?text={{ product.name }}" alt="{{ product.name }}" style="width: 100%; border-radius: 8px;">
+        {% endif %}
+    </div>
+    
+    <div style="flex: 1;">
+        <h1>{{ product.name }}</h1>
+        <p style="color: #666; margin: 0.5rem 0;">Thương hiệu: <strong>{{ product.brand.name }}</strong></p>
+        <p style="color: #666; margin: 0.5rem 0;">Danh mục: <strong>{{ product.category.name }}</strong></p>
+        
+        <div style="margin: 1.5rem 0;">
+            {% if product.discount_price %}
+                <span class="product-old-price" style="font-size: 1.2rem;">{{ product.price|floatformat:0 }}đ</span>
+                <span class="product-price" style="font-size: 2rem;">{{ product.discount_price|floatformat:0 }}đ</span>
+                <span style="background: #e74c3c; color: white; padding: 0.3rem 0.7rem; border-radius: 5px; margin-left: 1rem;">-{{ product.get_discount_percentage }}%</span>
+            {% else %}
+                <span class="product-price" style="font-size: 2rem;">{{ product.price|floatformat:0 }}đ</span>
+            {% endif %}
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 1.5rem 0;">
+            <h3>Thông số kỹ thuật</h3>
+            <table style="width: 100%; margin-top: 1rem;">
+                {% if product.processor %}
+                <tr><td style="padding: 0.5rem; border-bottom: 1px solid #ddd;"><strong>CPU:</strong></td><td style="padding: 0.5rem; border-bottom: 1px solid #ddd;">{{ product.processor }}</td></tr>
+                {% endif %}
+                {% if product.ram %}
+                <tr><td style="padding: 0.5rem; border-bottom: 1px solid #ddd;"><strong>RAM:</strong></td><td style="padding: 0.5rem; border-bottom: 1px solid #ddd;">{{ product.ram }}</td></tr>
+                {% endif %}
+                {% if product.storage %}
+                <tr><td style="padding: 0.5rem; border-bottom: 1px solid #ddd;"><strong>Bộ nhớ:</strong></td><td style="padding: 0.5rem; border-bottom: 1px solid #ddd;">{{ product.storage }}</td></tr>
+                {% endif %}
+                {% if product.screen_size %}
+                <tr><td style="padding: 0.5rem; border-bottom: 1px solid #ddd;"><strong>Màn hình:</strong></td><td style="padding: 0.5rem; border-bottom: 1px solid #ddd;">{{ product.screen_size }}</td></tr>
+                {% endif %}
+                {% if product.camera %}
+                <tr><td style="padding: 0.5rem; border-bottom: 1px solid #ddd;"><strong>Camera:</strong></td><td style="padding: 0.5rem; border-bottom: 1px solid #ddd;">{{ product.camera }}</td></tr>
+                {% endif %}
+                {% if product.graphics_card %}
+                <tr><td style="padding: 0.5rem; border-bottom: 1px solid #ddd;"><strong>Card đồ họa:</strong></td><td style="padding: 0.5rem; border-bottom: 1px solid #ddd;">{{ product.graphics_card }}</td></tr>
+                {% endif %}
+                {% if product.battery %}
+                <tr><td style="padding: 0.5rem; border-bottom: 1px solid #ddd;"><strong>Pin:</strong></td><td style="padding: 0.5rem; border-bottom: 1px solid #ddd;">{{ product.battery }}</td></tr>
+                {% endif %}
+                {% if product.operating_system %}
+                <tr><td style="padding: 0.5rem;"><strong>Hệ điều hành:</strong></td><td style="padding: 0.5rem;">{{ product.operating_system }}</td></tr>
+                {% endif %}
+            </table>
+        </div>
+        
+        <p style="margin: 1rem 0;">Còn lại: <strong>{{ product.stock }}</strong> sản phẩm</p>
+        
+        {% if user.is_authenticated %}
+            <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                <a href="{% url 'add_to_cart' product.id %}" class="btn" style="flex: 1; font-size: 1.1rem; padding: 1rem;">🛒 Thêm vào giỏ</a>
+                <a href="{% url 'buy_now' product.id %}" class="btn btn-success" style="flex: 1; font-size: 1.1rem; padding: 1rem;">💳 Mua ngay</a>
+            </div>
+        {% else %}
+            <a href="{% url 'login' %}?next={{ request.path }}" class="btn" style="font-size: 1.2rem; padding: 1rem 2rem; width: 100%;">Đăng nhập để mua hàng</a>
+        {% endif %}
+    </div>
+</div>
+
+<div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem;">
+    <h2>Mô tả sản phẩm</h2>
+    <p style="margin-top: 1rem; line-height: 1.8;">{{ product.description }}</p>
+</div>
+
+<div style="margin-bottom: 2rem;">
+    <h2>Đánh giá sản phẩm ({{ reviews.count }})</h2>
+    <p style="margin: 1rem 0;">Đánh giá trung bình: <strong>{{ avg_rating|floatformat:1 }}/5</strong> ⭐</p>
+    
+    {% if user.is_authenticated %}
+    <form method="post" action="{% url 'add_review' product.id %}" style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+        {% csrf_token %}
+        <label>Đánh giá của bạn:</label>
+        <select name="rating" required style="padding: 0.5rem; margin: 0.5rem 0; width: 100%;">
+            <option value="5">⭐⭐⭐⭐⭐ Tuyệt vời</option>
+            <option value="4">⭐⭐⭐⭐ Tốt</option>
+            <option value="3">⭐⭐⭐ Trung bình</option>
+            <option value="2">⭐⭐ Kém</option>
+            <option value="1">⭐ Rất kém</option>
+        </select>
+        <textarea name="comment" rows="3" placeholder="Nhận xét của bạn..." required style="width: 100%; padding: 0.5rem; margin: 0.5rem 0;"></textarea>
+        <button type="submit" class="btn">Gửi đánh giá</button>
+    </form>
+    {% endif %}
+    
+    <div style="margin-top: 1.5rem;">
+        {% for review in reviews %}
+        <div style="border-bottom: 1px solid #ddd; padding: 1rem 0;">
+            <strong>{{ review.user.username }}</strong> - 
+            {% for i in "12345" %}
+                {% if forloop.counter <= review.rating %}⭐{% endif %}
+            {% endfor %}
+            <p style="color: #666; font-size: 0.9rem;">{{ review.created_at|date:"d/m/Y" }}</p>
+            <p style="margin-top: 0.5rem;">{{ review.comment }}</p>
+        </div>
+        {% empty %}
+        <p>Chưa có đánh giá nào.</p>
+        {% endfor %}
+    </div>
+</div>
+
+{% if related_products %}
+<div>
+    <h2>Sản phẩm liên quan</h2>
+    <div class="product-grid">
+        {% for product in related_products %}
+        <div class="product-card">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+                <img src="https://via.placeholder.com/250x200?text={{ product.name }}" alt="{{ product.name }}">
+            {% endif %}
+            <h3>{{ product.name }}</h3>
+            <span class="product-price">{{ product.get_final_price|floatformat:0 }}đ</span>
+            <a href="{% url 'product_detail' product.slug %}" class="btn">Xem chi tiết</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

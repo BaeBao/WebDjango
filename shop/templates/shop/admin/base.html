@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Panel{% endblock %} - TechShop</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; }
+        
+        /* Sidebar */
+        .sidebar { position: fixed; left: 0; top: 0; width: 250px; height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; overflow-y: auto; }
+        .sidebar-header { padding: 2rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header h2 { font-size: 1.5rem; }
+        .sidebar-menu { padding: 1rem 0; }
+        .sidebar-menu a { display: block; padding: 1rem 1.5rem; color: white; text-decoration: none; transition: all 0.3s; }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background: rgba(255,255,255,0.2); }
+        
+        /* Main content */
+        .main-content { margin-left: 250px; padding: 2rem; }
+        .header { background: white; padding: 1.5rem 2rem; border-radius: 10px; margin-bottom: 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { font-size: 1.8rem; color: #2c3e50; }
+        .header-actions a { margin-left: 1rem; padding: 0.5rem 1rem; background: #667eea; color: white; text-decoration: none; border-radius: 5px; }
+        
+        /* Messages */
+        .messages { margin-bottom: 1.5rem; }
+        .alert { padding: 1rem 1.5rem; border-radius: 8px; margin-bottom: 1rem; }
+        .alert-success { background: #d4edda; color: #155724; border-left: 4px solid #28a745; }
+        .alert-error { background: #f8d7da; color: #721c24; border-left: 4px solid #dc3545; }
+        
+        /* Cards */
+        .card { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 1.5rem; }
+        .card h3 { margin-bottom: 1rem; color: #2c3e50; }
+        
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); border-left: 4px solid #667eea; }
+        .stat-card h4 { color: #666; font-size: 0.9rem; margin-bottom: 0.5rem; }
+        .stat-card .value { font-size: 2rem; font-weight: bold; color: #667eea; }
+        
+        /* Table */
+        table { width: 100%; border-collapse: collapse; }
+        table th { background: #f8f9fa; padding: 1rem; text-align: left; font-weight: 600; color: #2c3e50; }
+        table td { padding: 1rem; border-bottom: 1px solid #f0f0f0; }
+        table tr:hover { background: #f8f9fa; }
+        
+        /* Buttons */
+        .btn { display: inline-block; padding: 0.6rem 1.2rem; background: #667eea; color: white; text-decoration: none; border-radius: 5px; border: none; cursor: pointer; transition: all 0.3s; }
+        .btn:hover { background: #5568d3; transform: translateY(-2px); }
+        .btn-success { background: #27ae60; }
+        .btn-success:hover { background: #229954; }
+        .btn-danger { background: #e74c3c; }
+        .btn-danger:hover { background: #c0392b; }
+        .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.9rem; }
+        
+        /* Form */
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50; }
+        .form-control { width: 100%; padding: 0.8rem; border: 2px solid #e8e8e8; border-radius: 8px; font-size: 1rem; transition: border-color 0.3s; }
+        .form-control:focus { outline: none; border-color: #667eea; }
+        .form-check-input { width: auto; margin-right: 0.5rem; }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2>🛒 TechShop Admin</h2>
+            <p style="font-size: 0.9rem; opacity: 0.8; margin-top: 0.5rem;">Xin chào, {{ user.username }}!</p>
+        </div>
+        <div class="sidebar-menu">
+            <a href="{% url 'admin_dashboard' %}" {% if request.resolver_match.url_name == 'admin_dashboard' %}class="active"{% endif %}>📊 Dashboard</a>
+            <a href="{% url 'admin_products' %}" {% if 'product' in request.resolver_match.url_name %}class="active"{% endif %}>📦 Sản phẩm</a>
+            <a href="{% url 'admin_orders' %}" {% if 'order' in request.resolver_match.url_name %}class="active"{% endif %}>🛍️ Đơn hàng</a>
+            <a href="{% url 'admin_categories' %}" {% if 'categor' in request.resolver_match.url_name %}class="active"{% endif %}>🏷️ Danh mục</a>
+            <a href="{% url 'admin_brands' %}" {% if 'brand' in request.resolver_match.url_name %}class="active"{% endif %}>🏢 Thương hiệu</a>
+            <a href="{% url 'admin_users' %}" {% if 'user' in request.resolver_match.url_name %}class="active"{% endif %}>👥 Người dùng</a>
+            <hr style="border-color: rgba(255,255,255,0.1); margin: 1rem 0;">
+            <a href="{% url 'home' %}">🏠 Về trang chủ</a>
+            <a href="{% url 'logout' %}">🚪 Đăng xuất</a>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>{% block page_title %}Admin Panel{% endblock %}</h1>
+            <div class="header-actions">
+                {% block header_actions %}{% endblock %}
+            </div>
+        </div>
+        
+        <!-- Messages -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Content -->
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

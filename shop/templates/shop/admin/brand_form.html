@@ -1,0 +1,55 @@
+{% extends 'shop/admin/base.html' %}
+
+{% block title %}{% if action == 'add' %}Thêm thương hiệu{% else %}Sửa thương hiệu{% endif %}{% endblock %}
+{% block page_title %}{% if action == 'add' %}➕ Thêm thương hiệu mới{% else %}✏️ Sửa thương hiệu{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px;">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>Tên thương hiệu *</label>
+            {{ form.name }}
+        </div>
+        
+        <div class="form-group">
+            <label>Slug *</label>
+            {{ form.slug }}
+            <small style="color: #666;">VD: apple, samsung</small>
+        </div>
+        
+        <div class="form-group">
+            <label>Logo thương hiệu</label>
+            {{ form.logo }}
+            {% if brand.logo %}
+                <div style="margin-top: 1rem;">
+                    <p style="color: #666; margin-bottom: 0.5rem;">Logo hiện tại:</p>
+                    <img src="{{ brand.logo.url }}" alt="{{ brand.name }}" style="max-width: 150px; border-radius: 8px;">
+                </div>
+            {% endif %}
+        </div>
+        
+        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #f0f0f0; text-align: right;">
+            <a href="{% url 'admin_brands' %}" class="btn" style="background: #95a5a6;">Hủy</a>
+            <button type="submit" class="btn btn-success">{% if action == 'add' %}➕ Thêm{% else %}💾 Cập nhật{% endif %}</button>
+        </div>
+    </form>
+</div>
+
+<script>
+// Auto generate slug from name
+document.querySelector('input[name="name"]').addEventListener('input', function(e) {
+    const slug = e.target.value
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
+    document.querySelector('input[name="slug"]').value = slug;
+});
+</script>
+{% endblock %}

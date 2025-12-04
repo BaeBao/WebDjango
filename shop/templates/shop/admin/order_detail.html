@@ -1,0 +1,134 @@
+{% extends 'shop/admin/base.html' %}
+
+{% block title %}Chi tiết đơn hàng{% endblock %}
+{% block page_title %}📋 Chi tiết đơn hàng #{{ order.order_number }}{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'admin_orders' %}" class="btn" style="background: #95a5a6;">← Quay lại</a>
+{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem;">
+    <!-- Cột trái -->
+    <div>
+        <!-- Thông tin đơn hàng -->
+        <div class="card">
+            <h3>📦 Thông tin đơn hàng</h3>
+            <table style="width: 100%; margin-top: 1rem;">
+                <tr>
+                    <td style="padding: 0.5rem; font-weight: 600;">Mã đơn hàng:</td>
+                    <td style="padding: 0.5rem;">{{ order.order_number }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem; font-weight: 600;">Ngày đặt:</td>
+                    <td style="padding: 0.5rem;">{{ order.created_at|date:"d/m/Y H:i" }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem; font-weight: 600;">Khách hàng:</td>
+                    <td style="padding: 0.5rem;">{{ order.user.username }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem; font-weight: 600;">Phương thức thanh toán:</td>
+                    <td style="padding: 0.5rem;">
+                        {% if order.payment_method == 'cod' %}💵 Thanh toán khi nhận hàng
+                        {% elif order.payment_method == 'bank' %}🏦 Chuyển khoản ngân hàng
+                        {% else %}📱 Ví MoMo{% endif %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <!-- Thông tin giao hàng -->
+        <div class="card">
+            <h3>🚚 Thông tin giao hàng</h3>
+            <table style="width: 100%; margin-top: 1rem;">
+                <tr>
+                    <td style="padding: 0.5rem; font-weight: 600;">Người nhận:</td>
+                    <td style="padding: 0.5rem;">{{ order.full_name }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem; font-weight: 600;">Email:</td>
+                    <td style="padding: 0.5rem;">{{ order.email }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem; font-weight: 600;">Số điện thoại:</td>
+                    <td style="padding: 0.5rem;">{{ order.phone }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 0.5rem; font-weight: 600;">Địa chỉ:</td>
+                    <td style="padding: 0.5rem;">{{ order.address }}, {{ order.district }}, {{ order.city }}</td>
+                </tr>
+                {% if order.note %}
+                <tr>
+                    <td style="padding: 0.5rem; font-weight: 600;">Ghi chú:</td>
+                    <td style="padding: 0.5rem;">{{ order.note }}</td>
+                </tr>
+                {% endif %}
+            </table>
+        </div>
+        
+        <!-- Sản phẩm -->
+        <div class="card">
+            <h3>📦 Sản phẩm</h3>
+            <table style="width: 100%; margin-top: 1rem;">
+                <thead>
+                    <tr style="background: #f8f9fa;">
+                        <th style="padding: 0.8rem; text-align: left;">Sản phẩm</th>
+                        <th style="padding: 0.8rem; text-align: center;">Đơn giá</th>
+                        <th style="padding: 0.8rem; text-align: center;">Số lượng</th>
+                        <th style="padding: 0.8rem; text-align: right;">Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                    <tr style="border-bottom: 1px solid #f0f0f0;">
+                        <td style="padding: 0.8rem;">
+                            <strong>{{ item.product.name }}</strong>
+                            <br><small style="color: #666;">{{ item.product.brand.name }}</small>
+                        </td>
+                        <td style="padding: 0.8rem; text-align: center;">{{ item.price|floatformat:0 }}đ</td>
+                        <td style="padding: 0.8rem; text-align: center;">{{ item.quantity }}</td>
+                        <td style="padding: 0.8rem; text-align: right; font-weight: bold;">{{ item.get_subtotal|floatformat:0 }}đ</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Cột phải -->
+    <div>
+        <!-- Cập nhật trạng thái -->
+        <div class="card">
+            <h3>🔄 Cập nhật trạng thái</h3>
+            <form method="post" style="margin-top: 1rem;">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Trạng thái hiện tại:</label>
+                    {{ form.status }}
+                </div>
+                <button type="submit" class="btn btn-success" style="width: 100%;">💾 Cập nhật</button>
+            </form>
+        </div>
+        
+        <!-- Tổng đơn hàng -->
+        <div class="card">
+            <h3>💰 Tổng đơn hàng</h3>
+            <div style="margin-top: 1rem;">
+                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #f0f0f0;">
+                    <span>Tạm tính:</span>
+                    <span>{{ order.subtotal|floatformat:0 }}đ</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #f0f0f0;">
+                    <span>Phí vận chuyển:</span>
+                    <span>{{ order.shipping_fee|floatformat:0 }}đ</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 1rem 0; margin-top: 1rem; border-top: 2px solid #667eea; font-size: 1.3rem; font-weight: bold; color: #e74c3c;">
+                    <span>Tổng cộng:</span>
+                    <span>{{ order.total|floatformat:0 }}đ</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

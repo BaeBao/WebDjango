@@ -1,0 +1,103 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+<h1>Thanh toán đơn hàng</h1>
+
+<div style="display: flex; gap: 2rem; margin-top: 2rem;">
+    <div style="flex: 2;">
+        <form method="post" style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px;">
+            {% csrf_token %}
+            <h2>Thông tin giao hàng</h2>
+            
+            <div style="margin: 1rem 0;">
+                <label style="display: block; margin-bottom: 0.5rem;">Họ và tên *</label>
+                <input type="text" name="full_name" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;" value="{{ user.get_full_name }}">
+            </div>
+            
+            <div style="margin: 1rem 0;">
+                <label style="display: block; margin-bottom: 0.5rem;">Email *</label>
+                <input type="email" name="email" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;" value="{{ user.email }}">
+            </div>
+            
+            <div style="margin: 1rem 0;">
+                <label style="display: block; margin-bottom: 0.5rem;">Số điện thoại *</label>
+                <input type="tel" name="phone" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+            </div>
+            
+            <div style="margin: 1rem 0;">
+                <label style="display: block; margin-bottom: 0.5rem;">Địa chỉ *</label>
+                <input type="text" name="address" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+            </div>
+            
+            <div style="display: flex; gap: 1rem;">
+                <div style="flex: 1; margin: 1rem 0;">
+                    <label style="display: block; margin-bottom: 0.5rem;">Tỉnh/Thành phố *</label>
+                    <input type="text" name="city" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+                
+                <div style="flex: 1; margin: 1rem 0;">
+                    <label style="display: block; margin-bottom: 0.5rem;">Quận/Huyện *</label>
+                    <input type="text" name="district" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;">
+                </div>
+            </div>
+            
+            <div style="margin: 1rem 0;">
+                <label style="display: block; margin-bottom: 0.5rem;">Ghi chú</label>
+                <textarea name="note" rows="3" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px;"></textarea>
+            </div>
+            
+            <h2 style="margin-top: 2rem;">Phương thức thanh toán</h2>
+            
+            <div style="margin: 1rem 0;">
+                <label style="display: block; padding: 1rem; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">
+                    <input type="radio" name="payment_method" value="cod" checked> Thanh toán khi nhận hàng (COD)
+                </label>
+            </div>
+            
+            <div style="margin: 1rem 0;">
+                <label style="display: block; padding: 1rem; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">
+                    <input type="radio" name="payment_method" value="bank"> Chuyển khoản ngân hàng
+                </label>
+            </div>
+            
+            <div style="margin: 1rem 0;">
+                <label style="display: block; padding: 1rem; border: 1px solid #ddd; border-radius: 5px; cursor: pointer;">
+                    <input type="radio" name="payment_method" value="momo"> Ví MoMo
+                </label>
+            </div>
+            
+            <button type="submit" class="btn btn-success" style="width: 100%; padding: 1rem; font-size: 1.1rem; margin-top: 1rem;">Đặt hàng</button>
+        </form>
+    </div>
+    
+    <div style="flex: 1;">
+        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; position: sticky; top: 20px;">
+            <h2>Đơn hàng của bạn</h2>
+            
+            <div style="margin-top: 1rem;">
+                {% for item in cart.items.all %}
+                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #ddd;">
+                    <span>{{ item.product.name }} x{{ item.quantity }}</span>
+                    <span>{{ item.get_subtotal|floatformat:0 }}đ</span>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #ddd;">
+                <div style="display: flex; justify-content: space-between; margin: 0.5rem 0;">
+                    <span>Tạm tính:</span>
+                    <span>{{ cart.get_total|floatformat:0 }}đ</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin: 0.5rem 0;">
+                    <span>Phí vận chuyển:</span>
+                    <span>30,000đ</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #ddd; font-size: 1.3rem; font-weight: bold; color: #e74c3c;">
+                    <span>Tổng cộng:</span>
+                    <span>{{ cart.get_total|add:30000|floatformat:0 }}đ</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+<h1>Đơn hàng của bạn</h1>
+
+{% if orders %}
+<div style="margin-top: 2rem;">
+    {% for order in orders %}
+    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div>
+                <h3>Đơn hàng #{{ order.order_number }}</h3>
+                <p style="color: #666;">Ngày đặt: {{ order.created_at|date:"d/m/Y H:i" }}</p>
+            </div>
+            <div>
+                {% if order.status == 'pending' %}
+                    <span style="background: #f39c12; color: white; padding: 0.5rem 1rem; border-radius: 5px;">Chờ xác nhận</span>
+                {% elif order.status == 'confirmed' %}
+                    <span style="background: #3498db; color: white; padding: 0.5rem 1rem; border-radius: 5px;">Đã xác nhận</span>
+                {% elif order.status == 'shipping' %}
+                    <span style="background: #9b59b6; color: white; padding: 0.5rem 1rem; border-radius: 5px;">Đang giao hàng</span>
+                {% elif order.status == 'delivered' %}
+                    <span style="background: #27ae60; color: white; padding: 0.5rem 1rem; border-radius: 5px;">Đã giao hàng</span>
+                {% elif order.status == 'cancelled' %}
+                    <span style="background: #e74c3c; color: white; padding: 0.5rem 1rem; border-radius: 5px;">Đã hủy</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div style="border-top: 1px solid #ddd; padding-top: 1rem;">
+            <p><strong>Người nhận:</strong> {{ order.full_name }}</p>
+            <p><strong>Số điện thoại:</strong> {{ order.phone }}</p>
+            <p><strong>Địa chỉ:</strong> {{ order.address }}, {{ order.district }}, {{ order.city }}</p>
+            <p><strong>Tổng tiền:</strong> <span style="color: #e74c3c; font-size: 1.2rem; font-weight: bold;">{{ order.total|floatformat:0 }}đ</span></p>
+        </div>
+        
+        <div style="margin-top: 1rem;">
+            <a href="{% url 'order_detail' order.id %}" class="btn">Xem chi tiết</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div style="text-align: center; padding: 3rem;">
+    <p style="font-size: 1.2rem; color: #666;">Bạn chưa có đơn hàng nào</p>
+    <a href="{% url 'product_list' %}" class="btn" style="margin-top: 1rem;">Mua sắm ngay</a>
+</div>
+{% endif %}
+{% endblock %}

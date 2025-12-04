@@ -1,0 +1,85 @@
+{% extends 'shop/admin/base.html' %}
+
+{% block title %}Quản lý đơn hàng{% endblock %}
+{% block page_title %}🛍️ Quản lý đơn hàng{% endblock %}
+
+{% block content %}
+<div class="card">
+    <!-- Search & Filter -->
+    <form method="get" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+        <input type="text" name="search" class="form-control" placeholder="Tìm mã đơn, tên khách hàng, SĐT..." value="{{ request.GET.search }}" style="flex: 1;">
+        <select name="status" class="form-control" style="width: 200px;">
+            <option value="">Tất cả trạng thái</option>
+            <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Chờ xác nhận</option>
+            <option value="confirmed" {% if request.GET.status == 'confirmed' %}selected{% endif %}>Đã xác nhận</option>
+            <option value="shipping" {% if request.GET.status == 'shipping' %}selected{% endif %}>Đang giao hàng</option>
+            <option value="delivered" {% if request.GET.status == 'delivered' %}selected{% endif %}>Đã giao hàng</option>
+            <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>Đã hủy</option>
+        </select>
+        <button type="submit" class="btn">🔍 Tìm kiếm</button>
+    </form>
+    
+    <!-- Orders Table -->
+    <table>
+        <thead>
+            <tr>
+                <th>Mã đơn</th>
+                <th>Khách hàng</th>
+                <th>SĐT</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th>Thanh toán</th>
+                <th>Ngày đặt</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td><strong>{{ order.order_number }}</strong></td>
+                <td>{{ order.full_name }}</td>
+                <td>{{ order.phone }}</td>
+                <td style="color: #e74c3c; font-weight: bold;">{{ order.total|floatformat:0 }}đ</td>
+                <td>
+                    {% if order.status == 'pending' %}
+                        <span style="background: #f39c12; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem;">Chờ xác nhận</span>
+                    {% elif order.status == 'confirmed' %}
+                        <span style="background: #3498db; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem;">Đã xác nhận</span>
+                    {% elif order.status == 'shipping' %}
+                        <span style="background: #9b59b6; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem;">Đang giao</span>
+                    {% elif order.status == 'delivered' %}
+                        <span style="background: #27ae60; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem;">Đã giao</span>
+                    {% else %}
+                        <span style="background: #e74c3c; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem;">Đã hủy</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if order.payment_method == 'cod' %}💵 COD
+                    {% elif order.payment_method == 'bank' %}🏦 Chuyển khoản
+                    {% else %}📱 MoMo{% endif %}
+                </td>
+                <td>{{ order.created_at|date:"d/m/Y H:i" }}</td>
+                <td>
+                    <a href="{% url 'admin_order_detail' order.id %}" class="btn btn-sm">👁️ Xem</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="8" style="text-align: center; color: #999;">Chưa có đơn hàng nào</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- Pagination -->
+    {% if orders.has_other_pages %}
+    <div style="text-align: center; margin-top: 2rem;">
+        {% if orders.has_previous %}
+            <a href="?page={{ orders.previous_page_number }}" class="btn btn-sm">← Trang trước</a>
+        {% endif %}
+        <span style="margin: 0 1rem;">Trang {{ orders.number }} / {{ orders.paginator.num_pages }}</span>
+        {% if orders.has_next %}
+            <a href="?page={{ orders.next_page_number }}" class="btn btn-sm">Trang sau →</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

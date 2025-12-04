@@ -1,0 +1,80 @@
+{% extends 'shop/base.html' %}
+
+{% block title %}Đăng nhập - TechShop{% endblock %}
+
+{% block content %}
+<div style="min-height: 80vh; display: flex; align-items: center; justify-content: center; padding: 2rem 0;">
+    <div style="max-width: 500px; width: 100%; background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); overflow: hidden;">
+        
+        <!-- Header với gradient -->
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 3rem 2rem; text-align: center; color: white;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🔐</div>
+            <h1 style="font-size: 2rem; margin: 0; font-weight: bold;">Đăng nhập</h1>
+            <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Chào mừng bạn quay trở lại!</p>
+        </div>
+        
+        <!-- Form -->
+        <div style="padding: 2.5rem;">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50; font-size: 0.95rem;">
+                        👤 Tên đăng nhập
+                    </label>
+                    <input type="text" name="username" required 
+                           style="width: 100%; padding: 1rem; border: 2px solid #e8e8e8; border-radius: 12px; font-size: 1rem; transition: all 0.3s; background: #f8f9fa;"
+                           onfocus="this.style.borderColor='#667eea'; this.style.background='white'; this.style.boxShadow='0 0 0 4px rgba(102, 126, 234, 0.1)'" 
+                           onblur="this.style.borderColor='#e8e8e8'; this.style.background='#f8f9fa'; this.style.boxShadow='none'"
+                           placeholder="Nhập tên đăng nhập của bạn">
+                </div>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50; font-size: 0.95rem;">
+                        🔒 Mật khẩu
+                    </label>
+                    <input type="password" name="password" required 
+                           style="width: 100%; padding: 1rem; border: 2px solid #e8e8e8; border-radius: 12px; font-size: 1rem; transition: all 0.3s; background: #f8f9fa;"
+                           onfocus="this.style.borderColor='#667eea'; this.style.background='white'; this.style.boxShadow='0 0 0 4px rgba(102, 126, 234, 0.1)'" 
+                           onblur="this.style.borderColor='#e8e8e8'; this.style.background='#f8f9fa'; this.style.boxShadow='none'"
+                           placeholder="Nhập mật khẩu của bạn">
+                </div>
+                
+                <button type="submit" class="btn" 
+                        style="width: 100%; padding: 1.2rem; font-size: 1.1rem; font-weight: 600; margin-top: 1rem; border-radius: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);">
+                    Đăng nhập ngay
+                </button>
+            </form>
+            
+            <!-- Divider -->
+            <div style="display: flex; align-items: center; margin: 2rem 0;">
+                <div style="flex: 1; height: 1px; background: #e8e8e8;"></div>
+                <span style="padding: 0 1rem; color: #999; font-size: 0.9rem;">hoặc</span>
+                <div style="flex: 1; height: 1px; background: #e8e8e8;"></div>
+            </div>
+            
+            <!-- Link đăng ký -->
+            <div style="text-align: center;">
+                <p style="color: #666; margin-bottom: 1rem;">Chưa có tài khoản?</p>
+                <a href="{% url 'register' %}" 
+                   style="display: inline-block; padding: 1rem 2rem; background: #f8f9fa; color: #667eea; text-decoration: none; border-radius: 12px; font-weight: 600; transition: all 0.3s; border: 2px solid #e8e8e8;"
+                   onmouseover="this.style.background='#667eea'; this.style.color='white'; this.style.borderColor='#667eea'; this.style.transform='translateY(-2px)'"
+                   onmouseout="this.style.background='#f8f9fa'; this.style.color='#667eea'; this.style.borderColor='#e8e8e8'; this.style.transform='translateY(0)'">
+                    📝 Đăng ký tài khoản mới
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .container > div {
+        animation: fadeIn 0.5s ease-out;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'shop/admin/base.html' %}
+
+{% block title %}{% if action == 'add' %}Thêm danh mục{% else %}Sửa danh mục{% endif %}{% endblock %}
+{% block page_title %}{% if action == 'add' %}➕ Thêm danh mục mới{% else %}✏️ Sửa danh mục{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px;">
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label>Tên danh mục *</label>
+            {{ form.name }}
+        </div>
+        
+        <div class="form-group">
+            <label>Slug *</label>
+            {{ form.slug }}
+            <small style="color: #666;">VD: dien-thoai-cao-cap</small>
+        </div>
+        
+        <div class="form-group">
+            <label>Mô tả</label>
+            {{ form.description }}
+        </div>
+        
+        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #f0f0f0; text-align: right;">
+            <a href="{% url 'admin_categories' %}" class="btn" style="background: #95a5a6;">Hủy</a>
+            <button type="submit" class="btn btn-success">{% if action == 'add' %}➕ Thêm{% else %}💾 Cập nhật{% endif %}</button>
+        </div>
+    </form>
+</div>
+
+<script>
+// Auto generate slug from name
+document.querySelector('input[name="name"]').addEventListener('input', function(e) {
+    const slug = e.target.value
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
+    document.querySelector('input[name="slug"]').value = slug;
+});
+</script>
+{% endblock %}

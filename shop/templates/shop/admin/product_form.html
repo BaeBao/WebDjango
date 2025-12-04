@@ -1,0 +1,172 @@
+{% extends 'shop/admin/base.html' %}
+
+{% block title %}{% if action == 'add' %}Thêm sản phẩm{% else %}Sửa sản phẩm{% endif %}{% endblock %}
+{% block page_title %}{% if action == 'add' %}➕ Thêm sản phẩm mới{% else %}✏️ Sửa sản phẩm{% endif %}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <!-- Cột trái -->
+            <div>
+                <h3 style="margin-bottom: 1rem;">Thông tin cơ bản</h3>
+                
+                <div class="form-group">
+                    <label>Tên sản phẩm *</label>
+                    {{ form.name }}
+                </div>
+                
+                <div class="form-group">
+                    <label>Slug *</label>
+                    {{ form.slug }}
+                    <small style="color: #666;">VD: iphone-15-pro-max</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Danh mục *</label>
+                    {{ form.category }}
+                </div>
+                
+                <div class="form-group">
+                    <label>Thương hiệu *</label>
+                    {{ form.brand }}
+                </div>
+                
+                <div class="form-group">
+                    <label>Loại sản phẩm *</label>
+                    {{ form.product_type }}
+                </div>
+                
+                <div class="form-group">
+                    <label>Mô tả *</label>
+                    {{ form.description }}
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Giá *</label>
+                        {{ form.price }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Giá khuyến mãi</label>
+                        {{ form.discount_price }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tồn kho *</label>
+                        {{ form.stock }}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Ảnh sản phẩm *</label>
+                    {{ form.image }}
+                    {% if product.image %}
+                        <div style="margin-top: 1rem;">
+                            <p style="color: #666; margin-bottom: 0.5rem;">Ảnh hiện tại:</p>
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-width: 200px; border-radius: 8px;">
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        {{ form.is_featured }}
+                        Sản phẩm nổi bật (hiện trang chủ)
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        {{ form.is_available }}
+                        Có sẵn để bán
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Cột phải -->
+            <div>
+                <h3 style="margin-bottom: 1rem;">Thông số kỹ thuật</h3>
+                
+                <div class="form-group">
+                    <label>CPU/Processor</label>
+                    {{ form.processor }}
+                </div>
+                
+                <div class="form-group">
+                    <label>RAM</label>
+                    {{ form.ram }}
+                </div>
+                
+                <div class="form-group">
+                    <label>Bộ nhớ</label>
+                    {{ form.storage }}
+                </div>
+                
+                <div class="form-group">
+                    <label>Màn hình</label>
+                    {{ form.screen_size }}
+                </div>
+                
+                <div class="form-group">
+                    <label>Pin</label>
+                    {{ form.battery }}
+                </div>
+                
+                <div class="form-group">
+                    <label>Hệ điều hành</label>
+                    {{ form.operating_system }}
+                </div>
+                
+                <h4 style="margin: 1.5rem 0 1rem 0; color: #667eea;">Dành cho điện thoại</h4>
+                
+                <div class="form-group">
+                    <label>Camera</label>
+                    {{ form.camera }}
+                </div>
+                
+                <div class="form-group">
+                    <label>SIM</label>
+                    {{ form.sim }}
+                </div>
+                
+                <h4 style="margin: 1.5rem 0 1rem 0; color: #667eea;">Dành cho laptop</h4>
+                
+                <div class="form-group">
+                    <label>Card đồ họa</label>
+                    {{ form.graphics_card }}
+                </div>
+                
+                <div class="form-group">
+                    <label>Trọng lượng</label>
+                    {{ form.weight }}
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid #f0f0f0; text-align: right;">
+            <a href="{% url 'admin_products' %}" class="btn" style="background: #95a5a6;">Hủy</a>
+            <button type="submit" class="btn btn-success">{% if action == 'add' %}➕ Thêm sản phẩm{% else %}💾 Cập nhật{% endif %}</button>
+        </div>
+    </form>
+</div>
+
+<script>
+// Auto generate slug from name
+document.querySelector('input[name="name"]').addEventListener('input', function(e) {
+    const slug = e.target.value
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .trim();
+    document.querySelector('input[name="slug"]').value = slug;
+});
+</script>
+{% endblock %}

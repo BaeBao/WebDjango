@@ -1,0 +1,117 @@
+{% extends 'shop/admin/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}📊 Dashboard{% endblock %}
+
+{% block content %}
+<!-- Stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <h4>Tổng sản phẩm</h4>
+        <div class="value">{{ total_products }}</div>
+    </div>
+    <div class="stat-card" style="border-left-color: #e74c3c;">
+        <h4>Đơn hàng chờ xử lý</h4>
+        <div class="value" style="color: #e74c3c;">{{ pending_orders }}</div>
+    </div>
+    <div class="stat-card" style="border-left-color: #27ae60;">
+        <h4>Tổng đơn hàng</h4>
+        <div class="value" style="color: #27ae60;">{{ total_orders }}</div>
+    </div>
+    <div class="stat-card" style="border-left-color: #f39c12;">
+        <h4>Tổng người dùng</h4>
+        <div class="value" style="color: #f39c12;">{{ total_users }}</div>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h4>Doanh thu tổng</h4>
+        <div class="value">{{ total_revenue|floatformat:0 }}đ</div>
+    </div>
+    <div class="stat-card" style="border-left-color: #9b59b6;">
+        <h4>Đơn hàng tháng này</h4>
+        <div class="value" style="color: #9b59b6;">{{ this_month_orders }}</div>
+    </div>
+    <div class="stat-card" style="border-left-color: #3498db;">
+        <h4>Doanh thu tháng này</h4>
+        <div class="value" style="color: #3498db;">{{ this_month_revenue|floatformat:0 }}đ</div>
+    </div>
+</div>
+
+<!-- Recent Orders -->
+<div class="card">
+    <h3>📋 Đơn hàng gần đây</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Mã đơn</th>
+                <th>Khách hàng</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th>Ngày đặt</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in recent_orders %}
+            <tr>
+                <td><strong>{{ order.order_number }}</strong></td>
+                <td>{{ order.full_name }}</td>
+                <td style="color: #e74c3c; font-weight: bold;">{{ order.total|floatformat:0 }}đ</td>
+                <td>
+                    {% if order.status == 'pending' %}
+                        <span style="background: #f39c12; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem;">Chờ xác nhận</span>
+                    {% elif order.status == 'confirmed' %}
+                        <span style="background: #3498db; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem;">Đã xác nhận</span>
+                    {% elif order.status == 'shipping' %}
+                        <span style="background: #9b59b6; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem;">Đang giao</span>
+                    {% elif order.status == 'delivered' %}
+                        <span style="background: #27ae60; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem;">Đã giao</span>
+                    {% else %}
+                        <span style="background: #e74c3c; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem;">Đã hủy</span>
+                    {% endif %}
+                </td>
+                <td>{{ order.created_at|date:"d/m/Y H:i" }}</td>
+                <td>
+                    <a href="{% url 'admin_order_detail' order.id %}" class="btn btn-sm">Xem</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" style="text-align: center; color: #999;">Chưa có đơn hàng nào</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Low Stock Products -->
+{% if low_stock_products %}
+<div class="card">
+    <h3>⚠️ Sản phẩm sắp hết hàng</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Sản phẩm</th>
+                <th>Loại</th>
+                <th>Tồn kho</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in low_stock_products %}
+            <tr>
+                <td><strong>{{ product.name }}</strong></td>
+                <td>{% if product.product_type == 'phone' %}📱 Điện thoại{% else %}💻 Laptop{% endif %}</td>
+                <td>
+                    <span style="background: #e74c3c; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-weight: bold;">{{ product.stock }}</span>
+                </td>
+                <td>
+                    <a href="{% url 'admin_product_edit' product.id %}" class="btn btn-sm">Cập nhật</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

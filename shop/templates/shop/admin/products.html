@@ -1,0 +1,89 @@
+{% extends 'shop/admin/base.html' %}
+
+{% block title %}Quản lý sản phẩm{% endblock %}
+{% block page_title %}📦 Quản lý sản phẩm{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'admin_product_add' %}" class="btn btn-success">➕ Thêm sản phẩm mới</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <!-- Search & Filter -->
+    <form method="get" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+        <input type="text" name="search" class="form-control" placeholder="Tìm kiếm sản phẩm..." value="{{ request.GET.search }}" style="flex: 1;">
+        <select name="type" class="form-control" style="width: 200px;">
+            <option value="">Tất cả loại</option>
+            <option value="phone" {% if request.GET.type == 'phone' %}selected{% endif %}>Điện thoại</option>
+            <option value="laptop" {% if request.GET.type == 'laptop' %}selected{% endif %}>Laptop</option>
+        </select>
+        <button type="submit" class="btn">🔍 Tìm kiếm</button>
+    </form>
+    
+    <!-- Products Table -->
+    <table>
+        <thead>
+            <tr>
+                <th>Ảnh</th>
+                <th>Tên sản phẩm</th>
+                <th>Loại</th>
+                <th>Thương hiệu</th>
+                <th>Giá</th>
+                <th>Tồn kho</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 5px;">
+                    {% else %}
+                        <div style="width: 60px; height: 60px; background: #f0f0f0; border-radius: 5px; display: flex; align-items: center; justify-content: center;">📷</div>
+                    {% endif %}
+                </td>
+                <td><strong>{{ product.name }}</strong></td>
+                <td>{% if product.product_type == 'phone' %}📱 Điện thoại{% else %}💻 Laptop{% endif %}</td>
+                <td>{{ product.brand.name }}</td>
+                <td style="color: #e74c3c; font-weight: bold;">{{ product.get_final_price|floatformat:0 }}đ</td>
+                <td>
+                    {% if product.stock <= 10 %}
+                        <span style="color: #e74c3c; font-weight: bold;">{{ product.stock }}</span>
+                    {% else %}
+                        {{ product.stock }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% if product.is_available %}
+                        <span style="color: #27ae60;">✓ Đang bán</span>
+                    {% else %}
+                        <span style="color: #e74c3c;">✗ Ngừng bán</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="{% url 'admin_product_edit' product.id %}" class="btn btn-sm">✏️ Sửa</a>
+                    <a href="{% url 'admin_product_delete' product.id %}" class="btn btn-danger btn-sm">🗑️ Xóa</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="8" style="text-align: center; color: #999;">Chưa có sản phẩm nào</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- Pagination -->
+    {% if products.has_other_pages %}
+    <div style="text-align: center; margin-top: 2rem;">
+        {% if products.has_previous %}
+            <a href="?page={{ products.previous_page_number }}" class="btn btn-sm">← Trang trước</a>
+        {% endif %}
+        <span style="margin: 0 1rem;">Trang {{ products.number }} / {{ products.paginator.num_pages }}</span>
+        {% if products.has_next %}
+            <a href="?page={{ products.next_page_number }}" class="btn btn-sm">Trang sau →</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+<h1>Chi tiết đơn hàng #{{ order.order_number }}</h1>
+
+<div style="display: flex; gap: 2rem; margin-top: 2rem;">
+    <div style="flex: 2;">
+        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+            <h2>Thông tin đơn hàng</h2>
+            <p style="margin: 0.5rem 0;"><strong>Mã đơn hàng:</strong> {{ order.order_number }}</p>
+            <p style="margin: 0.5rem 0;"><strong>Ngày đặt:</strong> {{ order.created_at|date:"d/m/Y H:i" }}</p>
+            <p style="margin: 0.5rem 0;"><strong>Trạng thái:</strong> 
+                {% if order.status == 'pending' %}
+                    <span style="color: #f39c12;">Chờ xác nhận</span>
+                {% elif order.status == 'confirmed' %}
+                    <span style="color: #3498db;">Đã xác nhận</span>
+                {% elif order.status == 'shipping' %}
+                    <span style="color: #9b59b6;">Đang giao hàng</span>
+                {% elif order.status == 'delivered' %}
+                    <span style="color: #27ae60;">Đã giao hàng</span>
+                {% elif order.status == 'cancelled' %}
+                    <span style="color: #e74c3c;">Đã hủy</span>
+                {% endif %}
+            </p>
+            <p style="margin: 0.5rem 0;"><strong>Phương thức thanh toán:</strong> 
+                {% if order.payment_method == 'cod' %}Thanh toán khi nhận hàng
+                {% elif order.payment_method == 'bank' %}Chuyển khoản ngân hàng
+                {% elif order.payment_method == 'momo' %}Ví MoMo
+                {% endif %}
+            </p>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem;">
+            <h2>Thông tin giao hàng</h2>
+            <p style="margin: 0.5rem 0;"><strong>Người nhận:</strong> {{ order.full_name }}</p>
+            <p style="margin: 0.5rem 0;"><strong>Email:</strong> {{ order.email }}</p>
+            <p style="margin: 0.5rem 0;"><strong>Số điện thoại:</strong> {{ order.phone }}</p>
+            <p style="margin: 0.5rem 0;"><strong>Địa chỉ:</strong> {{ order.address }}, {{ order.district }}, {{ order.city }}</p>
+            {% if order.note %}
+            <p style="margin: 0.5rem 0;"><strong>Ghi chú:</strong> {{ order.note }}</p>
+            {% endif %}
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px;">
+            <h2>Sản phẩm</h2>
+            <table style="width: 100%; margin-top: 1rem;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #ddd;">
+                        <th style="padding: 0.5rem; text-align: left;">Sản phẩm</th>
+                        <th style="padding: 0.5rem; text-align: center;">Đơn giá</th>
+                        <th style="padding: 0.5rem; text-align: center;">Số lượng</th>
+                        <th style="padding: 0.5rem; text-align: right;">Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                    <tr style="border-bottom: 1px solid #ddd;">
+                        <td style="padding: 0.5rem;">{{ item.product.name }}</td>
+                        <td style="padding: 0.5rem; text-align: center;">{{ item.price|floatformat:0 }}đ</td>
+                        <td style="padding: 0.5rem; text-align: center;">{{ item.quantity }}</td>
+                        <td style="padding: 0.5rem; text-align: right;">{{ item.get_subtotal|floatformat:0 }}đ</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div style="flex: 1;">
+        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; position: sticky; top: 20px;">
+            <h2>Tổng đơn hàng</h2>
+            <div style="margin-top: 1rem;">
+                <div style="display: flex; justify-content: space-between; margin: 0.5rem 0;">
+                    <span>Tạm tính:</span>
+                    <span>{{ order.subtotal|floatformat:0 }}đ</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin: 0.5rem 0;">
+                    <span>Phí vận chuyển:</span>
+                    <span>{{ order.shipping_fee|floatformat:0 }}đ</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid #ddd; font-size: 1.3rem; font-weight: bold; color: #e74c3c;">
+                    <span>Tổng cộng:</span>
+                    <span>{{ order.total|floatformat:0 }}đ</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 2rem;">
+    <a href="{% url 'order_list' %}" class="btn">← Quay lại danh sách đơn hàng</a>
+</div>
+{% endblock %}

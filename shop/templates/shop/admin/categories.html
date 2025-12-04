@@ -1,0 +1,40 @@
+{% extends 'shop/admin/base.html' %}
+
+{% block title %}Quản lý danh mục{% endblock %}
+{% block page_title %}🏷️ Quản lý danh mục{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'admin_category_add' %}" class="btn btn-success">➕ Thêm danh mục mới</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Tên danh mục</th>
+                <th>Slug</th>
+                <th>Số sản phẩm</th>
+                <th>Ngày tạo</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for category in categories %}
+            <tr>
+                <td><strong>{{ category.name }}</strong></td>
+                <td><code>{{ category.slug }}</code></td>
+                <td>{{ category.products.count }} sản phẩm</td>
+                <td>{{ category.created_at|date:"d/m/Y" }}</td>
+                <td>
+                    <a href="{% url 'admin_category_edit' category.id %}" class="btn btn-sm">✏️ Sửa</a>
+                    <a href="{% url 'admin_category_delete' category.id %}" class="btn btn-danger btn-sm">🗑️ Xóa</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="text-align: center; color: #999;">Chưa có danh mục nào</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

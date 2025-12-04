@@ -1,0 +1,139 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block content %}
+<div id="content-main">
+    <h1 style="font-size: 2rem; margin-bottom: 2rem; color: #2c3e50;">📊 Dashboard Quản lý</h1>
+    
+    <!-- Statistics Cards -->
+    <div class="dashboard-stats">
+        <div class="stat-card" style="border-left-color: #3498db;">
+            <h3>Tổng sản phẩm</h3>
+            <div class="stat-value">{{ total_products|default:0 }}</div>
+            <p style="color: #666; margin-top: 0.5rem;">Đang bán</p>
+        </div>
+        
+        <div class="stat-card" style="border-left-color: #e74c3c;">
+            <h3>Đơn hàng chờ xử lý</h3>
+            <div class="stat-value">{{ pending_orders|default:0 }}</div>
+            <p style="color: #666; margin-top: 0.5rem;">Cần xác nhận</p>
+        </div>
+        
+        <div class="stat-card" style="border-left-color: #27ae60;">
+            <h3>Đơn hàng hôm nay</h3>
+            <div class="stat-value">{{ today_orders|default:0 }}</div>
+            <p style="color: #666; margin-top: 0.5rem;">Đơn mới</p>
+        </div>
+        
+        <div class="stat-card" style="border-left-color: #f39c12;">
+            <h3>Người dùng</h3>
+            <div class="stat-value">{{ total_users|default:0 }}</div>
+            <p style="color: #666; margin-top: 0.5rem;">Đã đăng ký</p>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+        <h2 style="margin-bottom: 1.5rem; color: #2c3e50;">⚡ Thao tác nhanh</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+            <a href="{% url 'admin:shop_product_add' %}" class="button" style="text-align: center; padding: 1rem;">
+                ➕ Thêm sản phẩm mới
+            </a>
+            <a href="{% url 'admin:shop_order_changelist' %}" class="button" style="text-align: center; padding: 1rem;">
+                📦 Quản lý đơn hàng
+            </a>
+            <a href="{% url 'admin:shop_category_add' %}" class="button" style="text-align: center; padding: 1rem;">
+                🏷️ Thêm danh mục
+            </a>
+            <a href="{% url 'admin:shop_brand_add' %}" class="button" style="text-align: center; padding: 1rem;">
+                🏢 Thêm thương hiệu
+            </a>
+        </div>
+    </div>
+    
+    <!-- Recent Orders -->
+    {% if recent_orders %}
+    <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 2rem;">
+        <h2 style="margin-bottom: 1.5rem; color: #2c3e50;">📋 Đơn hàng gần đây</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f8f9fa; border-bottom: 2px solid #ddd;">
+                    <th style="padding: 1rem; text-align: left;">Mã đơn</th>
+                    <th style="padding: 1rem; text-align: left;">Khách hàng</th>
+                    <th style="padding: 1rem; text-align: left;">Tổng tiền</th>
+                    <th style="padding: 1rem; text-align: left;">Trạng thái</th>
+                    <th style="padding: 1rem; text-align: left;">Ngày đặt</th>
+                    <th style="padding: 1rem; text-align: center;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in recent_orders %}
+                <tr style="border-bottom: 1px solid #f0f0f0;">
+                    <td style="padding: 1rem;">{{ order.order_number }}</td>
+                    <td style="padding: 1rem;">{{ order.full_name }}</td>
+                    <td style="padding: 1rem; color: #e74c3c; font-weight: bold;">{{ order.total|floatformat:0 }}đ</td>
+                    <td style="padding: 1rem;">
+                        {% if order.status == 'pending' %}
+                            <span style="background: #f39c12; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem;">Chờ xác nhận</span>
+                        {% elif order.status == 'confirmed' %}
+                            <span style="background: #3498db; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem;">Đã xác nhận</span>
+                        {% elif order.status == 'shipping' %}
+                            <span style="background: #9b59b6; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem;">Đang giao</span>
+                        {% elif order.status == 'delivered' %}
+                            <span style="background: #27ae60; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem;">Đã giao</span>
+                        {% else %}
+                            <span style="background: #e74c3c; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem;">Đã hủy</span>
+                        {% endif %}
+                    </td>
+                    <td style="padding: 1rem;">{{ order.created_at|date:"d/m/Y H:i" }}</td>
+                    <td style="padding: 1rem; text-align: center;">
+                        <a href="{% url 'admin:shop_order_change' order.id %}" class="button" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Xem</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+    
+    <!-- Low Stock Products -->
+    {% if low_stock_products %}
+    <div style="background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h2 style="margin-bottom: 1.5rem; color: #2c3e50;">⚠️ Sản phẩm sắp hết hàng</h2>
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background: #f8f9fa; border-bottom: 2px solid #ddd;">
+                    <th style="padding: 1rem; text-align: left;">Sản phẩm</th>
+                    <th style="padding: 1rem; text-align: left;">Loại</th>
+                    <th style="padding: 1rem; text-align: center;">Tồn kho</th>
+                    <th style="padding: 1rem; text-align: center;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in low_stock_products %}
+                <tr style="border-bottom: 1px solid #f0f0f0;">
+                    <td style="padding: 1rem;">{{ product.name }}</td>
+                    <td style="padding: 1rem;">
+                        {% if product.product_type == 'phone' %}📱 Điện thoại{% else %}💻 Laptop{% endif %}
+                    </td>
+                    <td style="padding: 1rem; text-align: center;">
+                        <span style="background: #e74c3c; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-weight: bold;">{{ product.stock }}</span>
+                    </td>
+                    <td style="padding: 1rem; text-align: center;">
+                        <a href="{% url 'admin:shop_product_change' product.id %}" class="button" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Cập nhật</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Auto refresh every 5 minutes
+setTimeout(function() {
+    location.reload();
+}, 300000);
+</script>
+{% endblock %}

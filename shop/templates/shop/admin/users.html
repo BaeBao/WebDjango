@@ -1,0 +1,71 @@
+{% extends 'shop/admin/base.html' %}
+
+{% block title %}Quản lý người dùng{% endblock %}
+{% block page_title %}👥 Quản lý người dùng{% endblock %}
+
+{% block content %}
+<div class="card">
+    <!-- Search -->
+    <form method="get" style="display: flex; gap: 1rem; margin-bottom: 1.5rem;">
+        <input type="text" name="search" class="form-control" placeholder="Tìm tên, email, username..." value="{{ request.GET.search }}" style="flex: 1;">
+        <button type="submit" class="btn">🔍 Tìm kiếm</button>
+    </form>
+    
+    <!-- Users Table -->
+    <table>
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Họ tên</th>
+                <th>Email</th>
+                <th>Quyền</th>
+                <th>Đơn hàng</th>
+                <th>Ngày đăng ký</th>
+                <th>Trạng thái</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td><strong>{{ user.username }}</strong></td>
+                <td>{{ user.get_full_name|default:"-" }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    {% if user.is_superuser %}
+                        <span style="background: #e74c3c; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem;">👑 Superuser</span>
+                    {% elif user.is_staff %}
+                        <span style="background: #3498db; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem;">⚙️ Admin</span>
+                    {% else %}
+                        <span style="background: #95a5a6; color: white; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.85rem;">👤 User</span>
+                    {% endif %}
+                </td>
+                <td>{{ user.orders.count }} đơn</td>
+                <td>{{ user.date_joined|date:"d/m/Y" }}</td>
+                <td>
+                    {% if user.is_active %}
+                        <span style="color: #27ae60;">✓ Hoạt động</span>
+                    {% else %}
+                        <span style="color: #e74c3c;">✗ Bị khóa</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7" style="text-align: center; color: #999;">Chưa có người dùng nào</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- Pagination -->
+    {% if users.has_other_pages %}
+    <div style="text-align: center; margin-top: 2rem;">
+        {% if users.has_previous %}
+            <a href="?page={{ users.previous_page_number }}" class="btn btn-sm">← Trang trước</a>
+        {% endif %}
+        <span style="margin: 0 1rem;">Trang {{ users.number }} / {{ users.paginator.num_pages }}</span>
+        {% if users.has_next %}
+            <a href="?page={{ users.next_page_number }}" class="btn btn-sm">Trang sau →</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

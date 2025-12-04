@@ -1,0 +1,46 @@
+{% extends 'shop/admin/base.html' %}
+
+{% block title %}Quản lý thương hiệu{% endblock %}
+{% block page_title %}🏢 Quản lý thương hiệu{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'admin_brand_add' %}" class="btn btn-success">➕ Thêm thương hiệu mới</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Logo</th>
+                <th>Tên thương hiệu</th>
+                <th>Slug</th>
+                <th>Số sản phẩm</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for brand in brands %}
+            <tr>
+                <td>
+                    {% if brand.logo %}
+                        <img src="{{ brand.logo.url }}" alt="{{ brand.name }}" style="width: 50px; height: 50px; object-fit: contain; border-radius: 5px;">
+                    {% else %}
+                        <div style="width: 50px; height: 50px; background: #f0f0f0; border-radius: 5px; display: flex; align-items: center; justify-content: center;">🏢</div>
+                    {% endif %}
+                </td>
+                <td><strong>{{ brand.name }}</strong></td>
+                <td><code>{{ brand.slug }}</code></td>
+                <td>{{ brand.products.count }} sản phẩm</td>
+                <td>
+                    <a href="{% url 'admin_brand_edit' brand.id %}" class="btn btn-sm">✏️ Sửa</a>
+                    <a href="{% url 'admin_brand_delete' brand.id %}" class="btn btn-danger btn-sm">🗑️ Xóa</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="text-align: center; color: #999;">Chưa có thương hiệu nào</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

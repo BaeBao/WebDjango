@@ -1,0 +1,33 @@
+{% extends 'shop/admin/base.html' %}
+
+{% block title %}Xóa thương hiệu{% endblock %}
+{% block page_title %}🗑️ Xóa thương hiệu{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <div style="text-align: center; padding: 2rem;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">⚠️</div>
+        <h2 style="margin-bottom: 1rem; color: #e74c3c;">Xác nhận xóa thương hiệu</h2>
+        <p style="font-size: 1.1rem; color: #666; margin-bottom: 2rem;">
+            Bạn có chắc chắn muốn xóa thương hiệu<br>
+            <strong style="color: #2c3e50;">"{{ brand.name }}"</strong>?
+        </p>
+        
+        {% if brand.logo %}
+        <img src="{{ brand.logo.url }}" alt="{{ brand.name }}" style="max-width: 150px; border-radius: 8px; margin-bottom: 2rem;">
+        {% endif %}
+        
+        <div style="background: #fff3cd; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; border-left: 4px solid #ffc107;">
+            <p style="color: #856404; margin: 0;">
+                <strong>Lưu ý:</strong> Các sản phẩm thuộc thương hiệu này sẽ bị ảnh hưởng!
+            </p>
+        </div>
+        
+        <form method="post" style="display: inline;">
+            {% csrf_token %}
+            <a href="{% url 'admin_brands' %}" class="btn" style="background: #95a5a6;">Hủy</a>
+            <button type="submit" class="btn btn-danger">🗑️ Xác nhận xóa</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends 'shop/base.html' %}
+
+{% block content %}
+<div style="display: flex; gap: 2rem;">
+    <aside style="width: 250px; flex-shrink: 0;">
+        <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+            <h3>Danh mục</h3>
+            <ul style="list-style: none; margin-top: 1rem;">
+                <li><a href="{% url 'product_list' %}?type=phone" style="display: block; padding: 0.5rem; text-decoration: none; color: #333;">📱 Điện thoại</a></li>
+                <li><a href="{% url 'product_list' %}?type=laptop" style="display: block; padding: 0.5rem; text-decoration: none; color: #333;">💻 Laptop</a></li>
+            </ul>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+            <h3>Thương hiệu</h3>
+            <ul style="list-style: none; margin-top: 1rem;">
+                {% for brand in brands %}
+                <li><a href="{% url 'product_list' %}?brand={{ brand.slug }}" style="display: block; padding: 0.5rem; text-decoration: none; color: #333;">{{ brand.name }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px;">
+            <h3>Sắp xếp</h3>
+            <ul style="list-style: none; margin-top: 1rem;">
+                <li><a href="?sort=-created_at" style="display: block; padding: 0.5rem; text-decoration: none; color: #333;">Mới nhất</a></li>
+                <li><a href="?sort=price" style="display: block; padding: 0.5rem; text-decoration: none; color: #333;">Giá thấp đến cao</a></li>
+                <li><a href="?sort=-price" style="display: block; padding: 0.5rem; text-decoration: none; color: #333;">Giá cao đến thấp</a></li>
+            </ul>
+        </div>
+    </aside>
+    
+    <div style="flex: 1;">
+        <h1 style="margin-bottom: 1.5rem;">
+            {% if current_type == 'phone' %}Điện thoại
+            {% elif current_type == 'laptop' %}Laptop
+            {% else %}Tất cả sản phẩm{% endif %}
+        </h1>
+        
+        <div class="product-grid">
+            {% for product in products %}
+            <div class="product-card">
+                {% if product.discount_price %}
+                    <span class="discount-badge">-{{ product.get_discount_percentage }}%</span>
+                {% endif %}
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                    <img src="https://via.placeholder.com/250x200?text={{ product.name }}" alt="{{ product.name }}">
+                {% endif %}
+                <h3>{{ product.name }}</h3>
+                <p class="product-brand">{{ product.brand.name }}</p>
+                <div class="product-price-section">
+                    {% if product.discount_price %}
+                        <span class="product-old-price">{{ product.price|floatformat:0 }}đ</span>
+                        <span class="product-price">{{ product.discount_price|floatformat:0 }}đ</span>
+                    {% else %}
+                        <span class="product-price">{{ product.price|floatformat:0 }}đ</span>
+                    {% endif %}
+                </div>
+                {% if user.is_authenticated %}
+                    <div class="product-buttons">
+                        <a href="{% url 'add_to_cart' product.id %}" class="btn-cart" title="Thêm vào giỏ">🛒</a>
+                        <a href="{% url 'buy_now' product.id %}" class="btn-buy">Mua ngay</a>
+                    </div>
+                    <a href="{% url 'product_detail' product.slug %}" class="btn-detail">Chi tiết →</a>
+                {% else %}
+                    <a href="{% url 'login' %}?next={{ request.path }}" class="btn-login">Đăng nhập để mua</a>
+                {% endif %}
+            </div>
+            {% empty %}
+            <p>Không tìm thấy sản phẩm nào.</p>
+            {% endfor %}
+        </div>
+        
+        {% if products.has_other_pages %}
+        <div style="text-align: center; margin-top: 2rem;">
+            {% if products.has_previous %}
+                <a href="?page={{ products.previous_page_number }}" class="btn">← Trang trước</a>
+            {% endif %}
+            <span style="margin: 0 1rem;">Trang {{ products.number }} / {{ products.paginator.num_pages }}</span>
+            {% if products.has_next %}
+                <a href="?page={{ products.next_page_number }}" class="btn">Trang sau →</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
